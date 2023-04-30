@@ -2,8 +2,12 @@
     "cSpell.words": [
         "abstractmetalprovider",
         "fakeprovider",
+        "httprouter",
         "metalprovider",
         "metalproviders",
         "metalprovidersmanager"
+    ],
+    "conventionalCommits.scopes": [
+        "metalproversmanager"
     ]
 }
