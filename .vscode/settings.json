@@ -2,12 +2,14 @@
     "cSpell.words": [
         "abstractmetalprovider",
         "fakeprovider",
+        "godotenv",
         "httprouter",
         "metalprovider",
         "metalproviders",
         "metalprovidersmanager"
     ],
     "conventionalCommits.scopes": [
-        "metalproversmanager"
+        "metalproversmanager",
+        "fakeprovider"
     ]
 }

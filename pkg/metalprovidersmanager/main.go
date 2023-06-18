@@ -38,7 +38,6 @@ func InitiateHardware(identifier *metalproviders.MetalProviderIdentifier,
 	metalType metal.HardwareTypes,
 	account accounts.Account,
 ) metal.Metal {
-
 	return genericCall[abstractmetalprovider.InitiateHardwarePayload, metal.Metal](
 		identifier,
 		"InitiateHardware",

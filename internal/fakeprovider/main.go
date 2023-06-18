@@ -1,39 +1,26 @@
 package fakeprovider
 
 import (
-	"encoding/json"
-	"fmt"
-	"github.com/nahojer/httprouter"
-	"net/http"
-	"log"
+	"os"
+	"strconv"
+
+	"github.com/shaharby7/Cloudy/internal/fakeprovider/app"
+	"github.com/shaharby7/Cloudy/pkg/deployable"
 )
 
-type HardwareParams struct {
-	MetalType string
-	Image     string
+var config = &deployable.DeployableConfig{
+	ProjectName:          "fakeprovider",
+	RequiredEnvVariables: []string{"PORT"},
 }
 
-func initiateHardware(hardwareParams *HardwareParams) {
+var port, _ = strconv.Atoi(os.Getenv("PORT"))
 
+var fakeProviderHTTPListener = &deployable.HTTPListenerController{
+	Config: &deployable.HTTPListenerControllerConfig{Port: port},
+	Router: app.FakeProviderHTTPRouter,
 }
 
-func InitFakeProvider() {
-
-	router := httprouter.New()
-
-	initiateHardwareHandler := func(responseWriter http.ResponseWriter, request *http.Request) {
-		var requestedHardwareParams HardwareParams
-		err := json.NewDecoder(request.Body).Decode(&requestedHardwareParams)
-
-		if err != nil {
-			log.Print(err.Error())
-			http.Error(responseWriter, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		}
-
-		fmt.Printf("Requested metal %s with image %s\n", requestedHardwareParams.MetalType, requestedHardwareParams.Image)
-		initiateHardware(&requestedHardwareParams)
-	}
-	router.HandleFunc("POST", "/initiateHardware", initiateHardwareHandler)
-
-	http.ListenAndServe(":3333", router)
-}
+var FakeProviderDeployable = deployable.NewDeployable(
+	*config,
+	[]deployable.IController{fakeProviderHTTPListener},
+)

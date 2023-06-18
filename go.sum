@@ -1,4 +1,6 @@
 github.com/golang/mock v1.3.1/go.mod h1:sBzyDLLjw3U8JLTeZvSv8jJB+tU5PVekmnlKIyFUx0Y=
+github.com/joho/godotenv v1.5.1 h1:7eLL/+HRGLY0ldzfGMeQkb7vMd0as4CfYvUVzLqw0N0=
+github.com/joho/godotenv v1.5.1/go.mod h1:f4LDr5Voq0i2e/R5DDNOoa2zzDfwtkZa6DnEwAbqwq4=
 github.com/nahojer/httprouter v1.0.3 h1:tEboHDIri+Gcb0NgvS6VWK12LYR4fZ13c/WRXg0I1Ss=
 github.com/nahojer/httprouter v1.0.3/go.mod h1:erbOdzyxqGzQbaQ4+WQ0h/XdLQx4WAP19HHUpWnRQQc=
 github.com/nahojer/sage v1.0.1 h1:kPWEyyIM5Xzo6mA2LsH72Xqj86dJoGtSZermRhyqiQU=
