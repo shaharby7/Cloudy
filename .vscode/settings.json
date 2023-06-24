@@ -1,12 +1,15 @@
 {
     "cSpell.words": [
         "abstractmetalprovider",
+        "contextable",
         "fakeprovider",
         "godotenv",
         "httprouter",
+        "loggable",
         "metalprovider",
         "metalproviders",
-        "metalprovidersmanager"
+        "metalprovidersmanager",
+        "projectable"
     ],
     "conventionalCommits.scopes": [
         "metalproversmanager",

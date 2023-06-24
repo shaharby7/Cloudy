@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	"github.com/shaharby7/Cloudy/internal/fakeprovider/app"
-	"github.com/shaharby7/Cloudy/pkg/deployable"
+	"github.com/shaharby7/Cloudy/pkg/projectable/deployable"
 )
 
 var config = &deployable.DeployableConfig{
@@ -15,8 +15,8 @@ var config = &deployable.DeployableConfig{
 
 var port, _ = strconv.Atoi(os.Getenv("PORT"))
 
-var fakeProviderHTTPListener = &deployable.HTTPListenerController{
-	Config: &deployable.HTTPListenerControllerConfig{Port: port},
+var fakeProviderHTTPListener = &deployable.HTTPServerController{
+	Config: &deployable.HTTPServerControllerConfig{Port: port},
 	Router: app.FakeProviderHTTPRouter,
 }
 

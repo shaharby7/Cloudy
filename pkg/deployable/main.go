@@ -1,6 +1,7 @@
 package deployable
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -9,6 +10,9 @@ import (
 	"sync"
 
 	"github.com/joho/godotenv"
+	"github.com/shaharby7/Cloudy/pkg/deployable/constants"
+	"github.com/shaharby7/Cloudy/pkg/deployable/controllable"
+	"github.com/shaharby7/Cloudy/pkg/deployable/loggable"
 )
 
 type Environments string
@@ -18,28 +22,33 @@ const (
 )
 
 type Deployable struct {
+	ctx         context.Context
 	ENV         Environments
 	ProjectName string
-	Controllers []IController
+	Logger      loggable.Loggable
+	Controllers []controllable.IController
+	OnError     func(ctx context.Context, err error)
 }
 
-func (d *Deployable) Start() {
+func (deployable *Deployable) Start(parentContext context.Context) {
 	var deployableWaitGroup sync.WaitGroup
-	for _, controller := range d.Controllers {
+	ctx := deployable.initiateDeployableContext(parentContext)
+	for _, controller := range deployable.Controllers {
 		deployableWaitGroup.Add(1)
-		err := controller.Start(&deployableWaitGroup)
+		err := controller.Start(ctx, &deployableWaitGroup)
 		if err != nil {
-			d.OnError(err)
+			deployable.OnError(ctx, err)
 		}
 	}
-	fmt.Printf("Project %s is running", d.ProjectName)
+	fmt.Printf("Project %s is running", deployable.ProjectName)
 	deployableWaitGroup.Wait()
 }
 
-func (d *Deployable) OnError(error error) {
-	fmt.Printf("Project %s could not be initialized", d.ProjectName)
-	fmt.Println(error)
-	os.Exit(1)
+func (deployable *Deployable) initiateDeployableContext(parentContext context.Context) context.Context {
+	ctx := context.WithValue(parentContext, constants.LOGGER_ATTR_NAME, &deployable.Logger)
+	ctx = context.WithValue(ctx, constants.DEPLOYABLE_ATTR_NAME, &deployable)
+	deployable.ctx = ctx
+	return ctx
 }
 
 type DeployableConfig struct {
@@ -57,7 +66,7 @@ func verifyEnvVariables(requiredEnvVariables *[]string) error {
 	return nil
 }
 
-func NewDeployable(deployableConfig DeployableConfig, controllers []IController) *Deployable {
+func NewDeployable(deployableConfig DeployableConfig, controllers []controllable.IController, logger loggable.Loggable, onError func(ctx context.Context, err error)) (*Deployable, error) {
 	ENV := os.Getenv("ENV")
 	if "" == ENV {
 		ENV = "LOCAL"
@@ -66,6 +75,8 @@ func NewDeployable(deployableConfig DeployableConfig, controllers []IController)
 		ENV:         Environments(ENV),
 		ProjectName: deployableConfig.ProjectName,
 		Controllers: controllers,
+		Logger:      logger,
+		OnError:     onError,
 	}
 	if deployable.ENV == LOCAL {
 		_, b, _, _ := runtime.Caller(0)
@@ -73,8 +84,5 @@ func NewDeployable(deployableConfig DeployableConfig, controllers []IController)
 		godotenv.Load(fmt.Sprintf("%s/local/%s.env", basePath, deployable.ProjectName))
 	}
 	err := verifyEnvVariables(&deployableConfig.RequiredEnvVariables)
-	if err != nil {
-		deployable.OnError(err)
-	}
-	return deployable
+	return deployable, err
 }
