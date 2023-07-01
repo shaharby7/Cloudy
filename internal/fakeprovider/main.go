@@ -5,7 +5,6 @@ import (
 	"strconv"
 
 	"github.com/shaharby7/Cloudy/internal/fakeprovider/app"
-	"github.com/shaharby7/Cloudy/pkg/projectable/deployable"
 )
 
 var config = &deployable.DeployableConfig{

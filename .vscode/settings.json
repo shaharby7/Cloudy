@@ -13,6 +13,7 @@
     ],
     "conventionalCommits.scopes": [
         "metalproversmanager",
-        "fakeprovider"
+        "fakeprovider",
+        "deployable"
     ]
 }
