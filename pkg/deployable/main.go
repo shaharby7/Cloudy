@@ -23,18 +23,18 @@ const (
 )
 
 type Deployable struct {
-	ctx         context.Context
-	ENV         Environments
-	ProjectName string
-	Logger      loggable.Loggable
-	Controllers []controllable.IController
-	OnError     func(ctx context.Context, err error)
+	ctx           context.Context
+	ENV           Environments
+	ProjectName   string
+	Logger        loggable.Loggable
+	Controllables []controllable.Controllable
+	OnError       func(ctx context.Context, err error)
 }
 
 func (deployable *Deployable) Start(parentContext context.Context) {
 	var deployableWaitGroup sync.WaitGroup
 	ctx := deployable.initiateDeployableContext(parentContext)
-	for _, controller := range deployable.Controllers {
+	for _, controller := range deployable.Controllables {
 		deployableWaitGroup.Add(1)
 		err := controller.Start(ctx, &deployableWaitGroup)
 		if err != nil {
@@ -46,8 +46,8 @@ func (deployable *Deployable) Start(parentContext context.Context) {
 }
 
 func (deployable *Deployable) initiateDeployableContext(parentContext context.Context) context.Context {
-	ctx := context.WithValue(parentContext, constants.LOGGER_ATTR_NAME, &deployable.Logger)
-	ctx = context.WithValue(ctx, constants.DEPLOYABLE_ATTR_NAME, &deployable)
+	ctx := context.WithValue(parentContext, constants.LOGGER_REF, &deployable.Logger)
+	ctx = context.WithValue(ctx, constants.DEPLOYABLE_REF, &deployable)
 	deployable.ctx = ctx
 	return ctx
 }
@@ -67,17 +67,22 @@ func verifyEnvVariables(requiredEnvVariables *[]string) error {
 	return nil
 }
 
-func NewDeployable(deployableConfig DeployableConfig, controllers []controllable.IController, logger loggable.Loggable, onError func(ctx context.Context, err error)) (*Deployable, error) {
+func NewDeployable(
+	deployableConfig DeployableConfig,
+	controllers []controllable.Controllable,
+	logger loggable.Loggable,
+	onError func(ctx context.Context, err error),
+) (*Deployable, error) {
 	ENV := os.Getenv("ENV")
 	if "" == ENV {
 		ENV = "LOCAL"
 	}
 	deployable := &Deployable{
-		ENV:         Environments(ENV),
-		ProjectName: deployableConfig.ProjectName,
-		Controllers: controllers,
-		Logger:      logger,
-		OnError:     onError,
+		ENV:           Environments(ENV),
+		ProjectName:   deployableConfig.ProjectName,
+		Controllables: controllers,
+		Logger:        logger,
+		OnError:       onError,
 	}
 	if deployable.ENV == LOCAL {
 		_, b, _, _ := runtime.Caller(0)

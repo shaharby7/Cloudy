@@ -1,7 +1,9 @@
 {
     "cSpell.words": [
         "abstractmetalprovider",
+        "Actionables",
         "contextable",
+        "Controllables",
         "fakeprovider",
         "godotenv",
         "httprouter",

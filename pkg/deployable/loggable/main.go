@@ -10,8 +10,20 @@ import (
 )
 
 type ITarget interface {
-	Log(ctx context.Context, eventName string, data *any) error
-	Get(ctx context.Context) (any, error)
+	Log(ctx context.Context, eventName string, data string) error
+	Get(ctx context.Context) (string, error)
+}
+
+type Console struct{}
+
+func NewConsoleTarget() *Console { return &Console{} }
+
+func (c *Console) Log(ctx context.Context, eventName string, data string) error {
+	fmt.Printf("%s\t%s\t%s", ctx.Value(constants.CTX_ID), eventName, data)
+	return nil
+}
+func (c *Console) Get(ctx context.Context) (string, error) {
+	return "", errors.New("Cannot get from target 'Console'")
 }
 
 type Loggable struct {
@@ -21,13 +33,13 @@ type Loggable struct {
 	OnError    func(error)
 }
 
-func Log(ctx context.Context, eventName string, data *any) {
+func Log(ctx context.Context, eventName string, data string) {
 	go func() {
 		ok := helpers.VerifyDeployableContext(ctx)
 		if !ok {
 			panic("Cannot log context that was not produced by deployable")
 		}
-		l := ctx.Value(constants.LOGGER_ATTR_NAME).(*Loggable)
+		l := ctx.Value(constants.LOGGER_REF).(*Loggable)
 		for _, eventTypeName := range l.Events[eventName].EventTypes {
 			for _, targetName := range l.EventTypes[eventTypeName].Targets {
 				err := l.Targets[targetName].Log(ctx, eventTypeName, data)
