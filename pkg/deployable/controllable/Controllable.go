@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/shaharby7/Cloudy/pkg/deployable/constants"
+	"github.com/shaharby7/Cloudy/pkg/deployable/errorable"
 )
 
 type TActionables[TControllableInput any, TControllableOutput any] map[string]Actionable[TControllableInput, TControllableOutput]
@@ -54,11 +55,7 @@ func (controllable *SControllable[TControllableInput, TControllableOutput]) Star
 	ctx = context.WithValue(ctx, constants.CONTROLLABLE_NAME, controllable.ControllerName)
 	err := controllable.executor(
 		func(actionableName string, input TControllableInput) (TControllableOutput, error) {
-			output, err := controllable.execute(ctx, actionableName, input)
-			if nil != err {
-				//TODO - think what should happen in this case? should the process be killed?
-			}
-			return output, nil
+			return controllable.execute(ctx, actionableName, input)
 		},
 	)
 	if nil != err {
@@ -75,6 +72,13 @@ func (controllable *SControllable[TControllableInput, TControllableOutput]) exec
 ) {
 	ctx = context.WithValue(ctx, "contextId", uuid.NewString())
 	actionableRef := controllable.actionables[actionableName]
+	if nil == actionableRef {
+		var zero TControllableOutput
+		return zero, errorable.NewErrorable(
+			errorable.ACTIONABLE_NOT_FOUND,
+			fmt.Sprintf("%s actionable not found", actionableName),
+		)
+	}
 	output, err := actionableRef.Run(ctx, input)
 	if nil != err {
 		return controllable.onActionFatalError(ctx, err)

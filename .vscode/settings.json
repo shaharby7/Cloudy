@@ -4,6 +4,8 @@
         "Actionables",
         "contextable",
         "Controllables",
+        "erbl",
+        "errorable",
         "fakeprovider",
         "godotenv",
         "httprouter",
