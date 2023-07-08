@@ -43,7 +43,6 @@ type SHttpServerControllable struct {
 
 func NewHttpServerControllable(
 	ControllerName string,
-	actionables HttpServerActionables,
 	config ServerControllableConfig,
 ) *SHttpServerControllable {
 	var server *http.Server
@@ -61,10 +60,10 @@ func NewHttpServerControllable(
 					Handler: mux,
 				}
 				go server.ListenAndServe() // TODO: handle errors and cancellations
+				fmt.Printf("Http server is listening on port %s\n", server.Addr)
 				return nil
 			},
 			func(ctx context.Context, err error) ([]byte, error) { return []byte{}, nil }, //TODO
-			actionables,
 		),
 		config,
 		server,

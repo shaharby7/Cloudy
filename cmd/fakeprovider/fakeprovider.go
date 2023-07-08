@@ -7,5 +7,5 @@ import (
 )
 
 func main() {
-	fakeprovider.MyDeployable.Start(context.TODO())
+	fakeprovider.InstantiateFakeproviderDeployable().Start(context.TODO())
 }

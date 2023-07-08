@@ -2,6 +2,7 @@ package controllable
 
 import (
 	"context"
+	"fmt"
 	"sync"
 
 	"github.com/google/uuid"
@@ -30,15 +31,20 @@ func NewControllable[TControllableInput any, TControllableOutput any](
 	ControllerName string,
 	executor fExecutor[TControllableInput, TControllableOutput],
 	onActionFatalError func(context.Context, error) (TControllableOutput, error),
-	actionables TActionables[TControllableInput, TControllableOutput],
 ) *SControllable[TControllableInput, TControllableOutput] {
 	return &SControllable[TControllableInput, TControllableOutput]{
 		ControllerType:     ControllerType,
 		ControllerName:     ControllerName,
 		executor:           executor,
 		onActionFatalError: onActionFatalError,
-		actionables:        actionables,
+		actionables:        make(TActionables[TControllableInput, TControllableOutput]),
 	}
+}
+
+func (controllable *SControllable[TControllableInput, TControllableOutput]) RegisterActionable(
+	name string, actionable Actionable[TControllableInput, TControllableOutput],
+) {
+	controllable.actionables[name] = actionable
 }
 
 func (controllable *SControllable[TControllableInput, TControllableOutput]) Start(
@@ -58,6 +64,7 @@ func (controllable *SControllable[TControllableInput, TControllableOutput]) Star
 	if nil != err {
 		//TODO - think what should happen in this case? should the process be killed?
 	}
+	fmt.Printf("Controllable %s of type %s is running\n", controllable.ControllerName, controllable.ControllerType)
 	return nil
 }
 

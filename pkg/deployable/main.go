@@ -5,8 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"path/filepath"
-	"runtime"
 	"sync"
 
 	"github.com/joho/godotenv"
@@ -22,6 +20,11 @@ const (
 	LOCAL Environments = "LOCAL"
 )
 
+type DeployableConfig struct {
+	ProjectName          string
+	RequiredEnvVariables []string
+}
+
 type Deployable struct {
 	ctx           context.Context
 	ENV           Environments
@@ -29,6 +32,33 @@ type Deployable struct {
 	Logger        loggable.Loggable
 	Controllables []controllable.Controllable
 	OnError       func(ctx context.Context, err error)
+}
+
+func NewDeployable(
+	deployableConfig DeployableConfig,
+	logger loggable.Loggable,
+	onError func(ctx context.Context, err error),
+	enfile string, //TODO make it controlled by deployer
+) (*Deployable, error) {
+	ENV := Environments(os.Getenv("ENV"))
+	if "" == ENV {
+		ENV = "LOCAL"
+	}
+	if ENV == LOCAL {
+		err := loadEnvfile(deployableConfig.ProjectName, enfile)
+		if nil != err {
+			fmt.Printf("Warning, could not load local env file: %s\n", err)
+		}
+	}
+	err := verifyEnvVariables(&deployableConfig.RequiredEnvVariables)
+	deployable := &Deployable{
+		ENV:           ENV,
+		ProjectName:   deployableConfig.ProjectName,
+		Controllables: make([]controllable.Controllable, 0),
+		Logger:        logger,
+		OnError:       onError,
+	}
+	return deployable, err
 }
 
 func (deployable *Deployable) Start(parentContext context.Context) {
@@ -45,16 +75,15 @@ func (deployable *Deployable) Start(parentContext context.Context) {
 	deployableWaitGroup.Wait()
 }
 
+func (deployable *Deployable) RegisterControllable(c controllable.Controllable) {
+	deployable.Controllables = append(deployable.Controllables, c)
+}
+
 func (deployable *Deployable) initiateDeployableContext(parentContext context.Context) context.Context {
 	ctx := context.WithValue(parentContext, constants.LOGGER_REF, &deployable.Logger)
 	ctx = context.WithValue(ctx, constants.DEPLOYABLE_REF, &deployable)
 	deployable.ctx = ctx
 	return ctx
-}
-
-type DeployableConfig struct {
-	ProjectName          string
-	RequiredEnvVariables []string
 }
 
 func verifyEnvVariables(requiredEnvVariables *[]string) error {
@@ -67,28 +96,9 @@ func verifyEnvVariables(requiredEnvVariables *[]string) error {
 	return nil
 }
 
-func NewDeployable(
-	deployableConfig DeployableConfig,
-	controllers []controllable.Controllable,
-	logger loggable.Loggable,
-	onError func(ctx context.Context, err error),
-) (*Deployable, error) {
-	ENV := os.Getenv("ENV")
-	if "" == ENV {
-		ENV = "LOCAL"
-	}
-	deployable := &Deployable{
-		ENV:           Environments(ENV),
-		ProjectName:   deployableConfig.ProjectName,
-		Controllables: controllers,
-		Logger:        logger,
-		OnError:       onError,
-	}
-	if deployable.ENV == LOCAL {
-		_, b, _, _ := runtime.Caller(0)
-		basePath := filepath.Dir(b)
-		godotenv.Load(fmt.Sprintf("%s/local/%s.env", basePath, deployable.ProjectName))
-	}
-	err := verifyEnvVariables(&deployableConfig.RequiredEnvVariables)
-	return deployable, err
+func loadEnvfile(projectName string, envfile string) error {
+	// _, b, _, _ := runtime.Caller(0)
+	// basePath := filepath.Dir(b)
+	// envFilePath := fmt.Sprintf("%s/local/%s.env", basePath, projectName)
+	return godotenv.Load(envfile)
 }

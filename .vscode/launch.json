@@ -9,10 +9,7 @@
       "type": "go",
       "request": "launch",
       "mode": "auto",
-      "program": "${workspaceFolder}/cmd/fakeprovider/fakeprovider.go",
-      "env": {
-        "PORT": "3334"
-      }
+      "program": "${workspaceFolder}/cmd/fakeprovider/fakeprovider.go"
     }
   ]
 }
