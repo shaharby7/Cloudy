@@ -62,29 +62,8 @@ func NewHttpServerControllable(
 				mux := http.NewServeMux()
 				mux.HandleFunc("/", func(responseWriter http.ResponseWriter, request *http.Request) {
 					output, err := execute(request.RequestURI, request)
-					if nil != err {
-						erbl, ok := err.(errorable.Errorable)
-						if ok {
-							switch erbl.Code() {
-							case errorable.ACTIONABLE_NOT_FOUND:
-								responseWriter.WriteHeader(404)
-								io.WriteString(responseWriter, "Page not found")
-								return
-							}
-						}
-						responseWriter.WriteHeader(500)
-						io.WriteString(responseWriter, "unknown error")
-					}
-					if nil != output.Headers {
-						for headerName, headerVal := range output.Headers {
-							responseWriter.Header().Add(headerName, headerVal)
-						}
-					}
-					if 0 == output.StatusCode {
-						output.StatusCode = 200
-					}
-					responseWriter.WriteHeader(output.StatusCode)
-					io.WriteString(responseWriter, output.Data)
+					output = handleRouteError(err, output)
+					returnServerOutput(output, responseWriter)
 				})
 				server = &http.Server{
 					Addr:    fmt.Sprintf(":%d", config.Port),
@@ -101,4 +80,35 @@ func NewHttpServerControllable(
 		config,
 		server,
 	}
+}
+
+func handleRouteError(err error, output TServerOutput) TServerOutput {
+	if nil != err {
+		erbl, ok := err.(errorable.Errorable)
+		if ok {
+			switch erbl.Code() {
+			case errorable.ACTIONABLE_NOT_FOUND:
+				output = &Response{
+					Data:       "Page not found",
+					StatusCode: 404,
+				}
+				return output
+			}
+		}
+		output = &Response{Data: "Server error", StatusCode: 500}
+	}
+	return output
+}
+
+func returnServerOutput(output TServerOutput, responseWriter http.ResponseWriter) {
+	if nil != output.Headers {
+		for headerName, headerVal := range output.Headers {
+			responseWriter.Header().Add(headerName, headerVal)
+		}
+	}
+	if 0 == output.StatusCode {
+		output.StatusCode = 200
+	}
+	responseWriter.WriteHeader(output.StatusCode)
+	io.WriteString(responseWriter, output.Data)
 }
