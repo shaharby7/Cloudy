@@ -33,7 +33,7 @@ func InstantiateFakeproviderDeployable() *deployable.Deployable {
 	MyAction := controllable.NewHttpServerActionable(
 		func(ctx context.Context, name string) (string, error) {
 			if name == "shalom" {
-				return "", errors.New("your name is ugly!")
+				return "", errors.New("your name is ugly")
 			}
 			return fmt.Sprintf("hello %s", name), nil
 		},

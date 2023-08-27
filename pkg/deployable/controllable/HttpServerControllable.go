@@ -60,6 +60,12 @@ func NewHttpServerControllable(
 			ControllerName,
 			func(execute func(actionableName string, input TServerInput) (TServerOutput, error)) error {
 				mux := http.NewServeMux()
+				mux.HandleFunc("/liveness-probe", func(responseWriter http.ResponseWriter, request *http.Request) {
+					returnServerOutput(&Response{StatusCode: 200, Data: "OK"}, responseWriter)
+				})
+				mux.HandleFunc("/readiness-probe", func(responseWriter http.ResponseWriter, request *http.Request) {
+					returnServerOutput(&Response{StatusCode: 200, Data: "OK"}, responseWriter)
+				})
 				mux.HandleFunc("/", func(responseWriter http.ResponseWriter, request *http.Request) {
 					output, err := execute(request.RequestURI, request)
 					output = handleRouteError(err, output)
