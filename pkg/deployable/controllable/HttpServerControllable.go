@@ -67,9 +67,13 @@ func NewHttpServerControllable(
 					returnServerOutput(&Response{StatusCode: 200, Data: "OK"}, responseWriter)
 				})
 				mux.HandleFunc("/", func(responseWriter http.ResponseWriter, request *http.Request) {
-					output, err := execute(request.RequestURI, request)
-					output = handleRouteError(err, output)
-					returnServerOutput(output, responseWriter)
+					if request.RequestURI == "/readiness-probe" || request.RequestURI == "/liveness-probe" {
+						returnServerOutput(&Response{StatusCode: 200, Data: "OK"}, responseWriter)
+					} else {
+						output, err := execute(request.RequestURI, request)
+						output = handleRouteError(err, output)
+						returnServerOutput(output, responseWriter)
+					}
 				})
 				server = &http.Server{
 					Addr:    fmt.Sprintf(":%d", config.Port),
