@@ -1,0 +1,15 @@
+package vms
+
+// type Machine_id string
+
+type CreateVmOptions struct {
+	User_data_b64 string `json:"user_data_b64"`
+}
+
+type DeleteVmOptions struct {
+	Machine_id string `json:"machine_id"`
+}
+
+type Result struct {
+	Machine_id string `json:"machine_id"`
+}

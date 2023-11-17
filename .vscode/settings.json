@@ -13,7 +13,8 @@
         "metalprovider",
         "metalproviders",
         "metalprovidersmanager",
-        "projectable"
+        "projectable",
+        "unscesfull"
     ],
     "conventionalCommits.scopes": [
         "metalproversmanager",

@@ -116,7 +116,7 @@ func returnServerOutput(output TServerOutput, responseWriter http.ResponseWriter
 			responseWriter.Header().Add(headerName, headerVal)
 		}
 	}
-	if 0 == output.StatusCode {
+	if output.StatusCode == 0 {
 		output.StatusCode = 200
 	}
 	responseWriter.WriteHeader(output.StatusCode)
