@@ -14,6 +14,8 @@ import (
 	"github.com/shaharby7/Cloudy/pkg/deployable/controllable"
 )
 
+var defaultHeaders = map[string]string{"Content-Type": "application/json"}
+
 func genericInputGenerator[InputType any](ctx context.Context, input controllable.TServerInput) (*InputType, error) {
 	defer input.Body.Close()
 	body, err := io.ReadAll(input.Body)
@@ -34,7 +36,7 @@ func genericOutputGenerator[OutputType any](ctx context.Context, result *OutputT
 		return nil, err
 	}
 	return &controllable.Response{
-		Data: string(respData),
+		Data: string(respData), Headers: defaultHeaders,
 	}, nil
 }
 
@@ -43,9 +45,9 @@ func genericErrorHandler(ctx context.Context, err error) (controllable.TServerOu
 	body := &interfaces.APIErrorResponse{Success: false, Error: err.Error()}
 	respData, parseErr := json.Marshal(body)
 	if parseErr != nil {
-		return &controllable.Response{Data: parseErr.Error(), StatusCode: 500}, nil
+		return &controllable.Response{Data: parseErr.Error(), Headers: defaultHeaders}, nil
 	}
-	return &controllable.Response{Data: string(respData), StatusCode: 500}, nil
+	return &controllable.Response{Data: string(respData), StatusCode: 500, Headers: defaultHeaders}, nil
 }
 
 func GenerateServer() controllable.Controllable {
