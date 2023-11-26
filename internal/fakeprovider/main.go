@@ -6,6 +6,7 @@ import (
 
 	"github.com/shaharby7/Cloudy/internal/fakeprovider/controllers"
 	"github.com/shaharby7/Cloudy/internal/fakeprovider/databases"
+	"github.com/shaharby7/Cloudy/internal/fakeprovider/services"
 	"github.com/shaharby7/Cloudy/pkg/deployable"
 	"github.com/shaharby7/Cloudy/pkg/deployable/loggable"
 )
@@ -28,9 +29,23 @@ func InstantiateFakeproviderDeployable() *deployable.Deployable {
 		"/home/shahar/Projects/Cloudy/local/fakeprovider.env", // todo - infer from deployer
 	)
 
-	databases.InitiateRedisClient()
+	initiateClientsOrExit()
 
 	MyDeployable.RegisterControllable(controllers.GenerateServer())
 
 	return MyDeployable
+}
+
+func initiateClientsOrExit() {
+	var err error
+	err = databases.InitiateRedisClient()
+	if err != nil {
+		err = fmt.Errorf("Could not connect to redis: %s", err)
+		panic(err.Error())
+	}
+	err = services.InitiateK8SClient()
+	if err != nil {
+		err = fmt.Errorf("Could not initiate k8s client: %s", err)
+		panic(err.Error())
+	}
 }

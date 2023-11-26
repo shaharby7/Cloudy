@@ -11,14 +11,13 @@ import (
 )
 
 type CreateVmOptions struct {
-	Machine_id     string `json:"machine_id"`
+	Machine_id    string `json:"machine_id"`
 	User_data_b64 string `json:"user_data_b64"`
 }
 
 type DeleteVmOptions struct {
 	Machine_id string `json:"machine_id"`
 }
-
 
 func post[RequestBody any](ctx context.Context, path string, requestBody *RequestBody) error {
 	var address = os.Getenv("VMS_WEBHOOK_ADDRESS")
@@ -51,7 +50,7 @@ func SendCreateVM(ctx context.Context, machine_id string, user_data_b64 string) 
 		ctx,
 		"/create-vm",
 		&CreateVmOptions{
-			Machine_id:     machine_id,
+			Machine_id:    machine_id,
 			User_data_b64: user_data_b64,
 		},
 	)
