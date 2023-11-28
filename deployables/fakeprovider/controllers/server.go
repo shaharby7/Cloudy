@@ -8,9 +8,9 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/shaharby7/Cloudy/internal/fakeprovider/modules/vms"
+	"github.com/shaharby7/Cloudy/deployables/fakeprovider/modules/vms"
 
-	"github.com/shaharby7/Cloudy/internal/fakeprovider/interfaces"
+	"github.com/shaharby7/Cloudy/deployables/fakeprovider/interfaces"
 	"github.com/shaharby7/Cloudy/pkg/deployable/controllable"
 )
 

@@ -3,7 +3,7 @@ package vms
 import (
 	"context"
 
-	"github.com/shaharby7/Cloudy/internal/fakeprovider/services"
+	"github.com/shaharby7/Cloudy/deployables/fakeprovider/services"
 )
 
 func DeleteVM(ctx context.Context, options *DeleteVmOptions) (*Result, error) {

@@ -4,6 +4,7 @@
         "Actionables",
         "contextable",
         "Controllables",
+        "deployables",
         "erbl",
         "errorable",
         "fakeprovider",

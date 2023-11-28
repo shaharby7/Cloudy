@@ -3,7 +3,7 @@ package vms
 import (
 	"context"
 
-	"github.com/shaharby7/Cloudy/internal/fakeprovider/services"
+	"github.com/shaharby7/Cloudy/deployables/fakeprovider/services"
 )
 
 func GetVM(ctx context.Context, options *GetVmOptions) (*GetVmResults, error) {

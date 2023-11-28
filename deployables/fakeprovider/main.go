@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/shaharby7/Cloudy/internal/fakeprovider/controllers"
-	"github.com/shaharby7/Cloudy/internal/fakeprovider/databases"
-	"github.com/shaharby7/Cloudy/internal/fakeprovider/services"
+	"github.com/shaharby7/Cloudy/deployables/fakeprovider/controllers"
+	"github.com/shaharby7/Cloudy/deployables/fakeprovider/databases"
+	"github.com/shaharby7/Cloudy/deployables/fakeprovider/services"
 	"github.com/shaharby7/Cloudy/pkg/deployable"
 	"github.com/shaharby7/Cloudy/pkg/deployable/loggable"
 )

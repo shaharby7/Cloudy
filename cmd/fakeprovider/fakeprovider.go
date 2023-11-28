@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 
-	"github.com/shaharby7/Cloudy/internal/fakeprovider"
+	"github.com/shaharby7/Cloudy/deployables/fakeprovider"
 )
 
 func main() {
