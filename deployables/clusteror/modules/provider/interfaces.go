@@ -1,9 +1,11 @@
 package provider
 
-type Something struct {
-	Ho string
+type Provider interface {
+	Identify() *ProviderCommonData
+	CreateMachine() error
+	DestroyMachine() error
 }
 
-type ProviderData struct {
-	Name string `json:"name"`
+type ProviderCommonData struct {
+	Code ProviderCode `json:"code"`
 }
