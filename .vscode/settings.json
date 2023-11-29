@@ -2,6 +2,7 @@
     "cSpell.words": [
         "abstractmetalprovider",
         "Actionables",
+        "clusteror",
         "contextable",
         "Controllables",
         "deployables",
@@ -16,6 +17,7 @@
         "metalprovidersmanager",
         "projectable",
         "runspace",
+        "serverutils",
         "unscesfull"
     ],
     "conventionalCommits.scopes": [

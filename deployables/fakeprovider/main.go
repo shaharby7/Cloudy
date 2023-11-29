@@ -11,7 +11,7 @@ import (
 	"github.com/shaharby7/Cloudy/pkg/deployable/loggable"
 )
 
-func InstantiateFakeproviderDeployable() *deployable.Deployable {
+func Initiate() *deployable.Deployable {
 	myLoggable := &loggable.Loggable{
 		Targets:    map[string]loggable.ITarget{"console": loggable.NewConsoleTarget()},
 		EventTypes: map[string]struct{ Targets []string }{"info": {Targets: []string{"console"}}},
@@ -19,7 +19,7 @@ func InstantiateFakeproviderDeployable() *deployable.Deployable {
 		OnError:    func(err error) { fmt.Println(err) },
 	}
 
-	MyDeployable, _ := deployable.NewDeployable(
+	dep, _ := deployable.NewDeployable(
 		deployable.DeployableConfig{
 			ProjectName:          "fakeprovider",
 			RequiredEnvVariables: []string{"PORT", "REDIS_DOMAIN", "REDIS_PORT", "SENSOR_ADDRESS"},
@@ -31,21 +31,21 @@ func InstantiateFakeproviderDeployable() *deployable.Deployable {
 
 	initiateClientsOrExit()
 
-	MyDeployable.RegisterControllable(controllers.GenerateServer())
+	dep.RegisterControllable(controllers.GenerateServer())
 
-	return MyDeployable
+	return dep
 }
 
 func initiateClientsOrExit() {
 	var err error
 	err = databases.InitiateRedisClient()
 	if err != nil {
-		err = fmt.Errorf("Could not connect to redis: %s", err)
+		err = fmt.Errorf("could not connect to redis: %s", err)
 		panic(err.Error())
 	}
 	err = services.InitiateK8SClient()
 	if err != nil {
-		err = fmt.Errorf("Could not initiate k8s client: %s", err)
+		err = fmt.Errorf("could not initiate k8s client: %s", err)
 		panic(err.Error())
 	}
 }
