@@ -1,5 +1,7 @@
 package provider
 
+
+
 type Provider interface {
 	Identify() *ProviderCommonData
 	CreateMachine() error

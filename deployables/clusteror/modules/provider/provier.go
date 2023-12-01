@@ -4,11 +4,16 @@ import (
 	"context"
 )
 
-type ProviderCode string
+type ProviderCode int
+
+const (
+	ProviderCode_FAKE1 ProviderCode = iota
+	ProviderCode_FAKE2
+)
 
 var providerByCode map[ProviderCode]Provider = map[ProviderCode]Provider{
-	"FAKE1": &Fake{Code: "FAKE1"},
-	"FAKE2": &Fake{Code: "FAKE2"},
+	ProviderCode_FAKE1: &Fake{Code: ProviderCode_FAKE1},
+	ProviderCode_FAKE2: &Fake{Code: ProviderCode_FAKE2},
 }
 
 func GetProviderByCode(code ProviderCode) Provider {
