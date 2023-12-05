@@ -20,7 +20,7 @@ func Initiate() *deployable.Deployable {
 	dep, _ := deployable.NewDeployable(
 		deployable.DeployableConfig{
 			ProjectName:          "clusteror",
-			RequiredEnvVariables: []string{"PORT"},
+			RequiredEnvVariables: []string{"PORT", "FAKEPROVIDER_ADDRESS"},
 		},
 		*myLoggable,
 		func(ctx context.Context, err error) { fmt.Println(err) },

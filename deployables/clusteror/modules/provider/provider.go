@@ -2,21 +2,16 @@ package provider
 
 import (
 	"context"
+
+	"github.com/shaharby7/Cloudy/deployables/clusteror/types"
 )
 
-type ProviderCode int
-
-const (
-	ProviderCode_FAKE1 ProviderCode = iota
-	ProviderCode_FAKE2
-)
-
-var providerByCode map[ProviderCode]Provider = map[ProviderCode]Provider{
-	ProviderCode_FAKE1: &Fake{Code: ProviderCode_FAKE1},
-	ProviderCode_FAKE2: &Fake{Code: ProviderCode_FAKE2},
+var providerByCode map[types.ProviderCode]Provider = map[types.ProviderCode]Provider{
+	types.FAKE1: &Fake{ProviderCode: types.FAKE1},
+	types.FAKE2: &Fake{ProviderCode: types.FAKE2},
 }
 
-func GetProviderByCode(code ProviderCode) Provider {
+func GetProviderByCode(code types.ProviderCode) Provider {
 	return providerByCode[code]
 }
 

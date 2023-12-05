@@ -3,6 +3,7 @@
         "abstractmetalprovider",
         "Actionables",
         "clusteror",
+        "consts",
         "contextable",
         "Controllables",
         "deployables",

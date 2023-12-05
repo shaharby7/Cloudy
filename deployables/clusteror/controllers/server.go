@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/shaharby7/Cloudy/deployables/clusteror/modules/machine"
 	"github.com/shaharby7/Cloudy/deployables/clusteror/modules/provider"
 )
 
@@ -17,7 +18,9 @@ func GenerateServer() controllable.Controllable {
 		*controllable.NewServerControllableConfig(port),
 	)
 
-	Server.RegisterActionable("/api/list-providers", serverutils.MakeServerRoute(provider.ListProviders))
+	Server.RegisterActionable("/api/providers/list-providers", serverutils.MakeServerRoute(provider.ListProviders))
+
+	Server.RegisterActionable("/api/machines/create-machine", serverutils.MakeServerRoute(machine.CreateAndRun))
 
 	return Server
 }
