@@ -1,0 +1,90 @@
+apt:
+  sources_list: |
+    deb http://us.archive.ubuntu.com/ubuntu/ $RELEASE main restricted universe multiverse
+    deb-src http://us.archive.ubuntu.com/ubuntu/ $RELEASE main restricted universe multiverse
+
+    deb http://us.archive.ubuntu.com/ubuntu/ $RELEASE-updates main restricted universe multiverse
+    deb-src http://us.archive.ubuntu.com/ubuntu/ $RELEASE-updates main restricted universe multiverse
+
+    deb http://us.archive.ubuntu.com/ubuntu/ $RELEASE-security main restricted universe multiverse
+    deb-src http://us.archive.ubuntu.com/ubuntu/ $RELEASE-security main restricted universe multiverse
+  conf: |
+    APT {
+      Get {
+        Assume-Yes "true";
+        Fix-Broken "true";
+      };
+    };
+
+packages:
+  - apt-transport-https
+  - ca-certificates
+  - gnupg2
+  - software-properties-common
+  - bridge-utils
+  - curl
+
+runcmd:
+  - [modprobe, overlay]
+  - [modprobe, br_netfilter]
+  - [sysctl, --system]
+  - [apt-get, install, -y, ca-certificates, gnupg]
+  - [sh, -c, "mkdir -m 0755 -p /etc/apt/keyrings"]
+  - [
+      sh,
+      -c,
+      "curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --yes --dearmor -o /usr/share/keyrings/kubernetes-archive-keyring.gpg",
+    ]
+  - [
+      sh,
+      -c,
+      'echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list > /dev/null',
+    ]
+  - [apt-get, update]
+  - [
+      apt-get,
+      install,
+      -y,
+      "--allow-change-held-packages",
+      "containerd",
+      "kubelet=1.28.2-00",
+      "kubectl=1.28.2-00",
+      "kubeadm=1.28.2-00",
+    ]
+  - [apt-mark, hold, kubelet, kubectl, kubeadm, containerd]
+  # Configure containerd
+  - [mkdir, -p, /etc/containerd]
+  - [sh, -c, "containerd config default > /etc/containerd/config.toml"]
+
+users:
+  - name: ubuntu
+    gecos: Ubuntu User
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+    passwd: ubuntu
+    lock_passwd: true
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKQIuY3x6i2IBSrsy2iaSiFuO/bSXF9JOz/3JaxgXPY1 shaharby7@gmail.com
+  - name: root
+    lock_passwd: true
+
+locale: en_US.UTF-8
+
+timezone: UTC
+
+ssh_deletekeys: 1
+
+package_upgrade: true
+
+ssh_pwauth: true
+
+manage_etc_hosts: true
+
+fqdn: kube.kube.demo
+
+hostname: kube
+
+power_state:
+  mode: reboot
+  timeout: 30
+  condition: true

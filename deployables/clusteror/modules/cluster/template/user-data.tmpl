@@ -1,0 +1,126 @@
+#cloud-config
+write_files:
+
+# CA ssh pub certificate
+- path: /etc/ssh/sshd_config
+  permissions: '0644'
+  content: |
+    TrustedUserCAKeys /etc/ssh/ca.pub
+  append: true
+
+# CA ssh pub certificate
+- path: /etc/ssh/ca.pub
+  permissions: '0644'
+  encoding: b64
+  content: |
+    c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSUZWTW1rTnRuRmZDaXRjcFFlWnFR
+    dVZQK0NKV1JtWGp3aGlRakoyalJxaS8gY2FAa3ViZS5kZW1vCg==
+
+# k8s conf
+- path: /home/ubuntu/kubeadm-config.yml
+  permissions: '0777'
+  content: |
+    apiVersion: kubeadm.k8s.io/v1beta2
+    kind: ClusterConfiguration
+    kubernetesVersion: stable-1.20
+    apiServer:
+      certSANs:
+      - "192.168.4.20"
+    controlPlaneEndpoint: "192.168.4.20:6443"
+    networking:
+      podSubnet: 10.244.0.0/16
+
+
+apt:
+  sources_list: |
+    deb http://us.archive.ubuntu.com/ubuntu/ $RELEASE main restricted universe multiverse
+    deb-src http://us.archive.ubuntu.com/ubuntu/ $RELEASE main restricted universe multiverse
+
+    deb http://us.archive.ubuntu.com/ubuntu/ $RELEASE-updates main restricted universe multiverse
+    deb-src http://us.archive.ubuntu.com/ubuntu/ $RELEASE-updates main restricted universe multiverse
+
+    deb http://us.archive.ubuntu.com/ubuntu/ $RELEASE-security main restricted universe multiverse
+    deb-src http://us.archive.ubuntu.com/ubuntu/ $RELEASE-security main restricted universe multiverse
+  conf: |
+    APT {
+      Get {
+        Assume-Yes "true";
+        Fix-Broken "true";
+      };
+    };
+
+packages:
+  - apt-transport-https
+  - ca-certificates
+  - gnupg2
+  - software-properties-common
+  - bridge-utils
+  - curl
+
+runcmd:
+  - [modprobe, overlay]
+  - [modprobe, br_netfilter]
+  - [sysctl, --system]
+  - [apt-get, install, -y, ca-certificates, gnupg]
+  - [sh, -c, "mkdir -m 0755 -p /etc/apt/keyrings"]
+  - [
+      sh,
+      -c,
+      "curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --yes --dearmor -o /usr/share/keyrings/kubernetes-archive-keyring.gpg",
+    ]
+  - [
+      sh,
+      -c,
+      'echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list > /dev/null',
+    ]
+  - [apt-get, update]
+  - [
+      apt-get,
+      install,
+      -y,
+      "--allow-change-held-packages",
+      "containerd",
+      "kubelet=1.28.2-00",
+      "kubectl=1.28.2-00",
+      "kubeadm=1.28.2-00",
+    ]
+  - [apt-mark, hold, kubelet, kubectl, kubeadm, containerd]
+  # Configure containerd
+  - [mkdir, -p, /etc/containerd]
+  - [sh, -c, "containerd config default > /etc/containerd/config.toml"]
+  # Init k8s
+  - [cd, "~"]
+  - [sh, -c "sudo kubeadm init --config=kubeadm-config.yaml --upload-certs --token {{.JoinToken}}"]
+
+users:
+  - name: ubuntu
+    gecos: Ubuntu User
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+    passwd: ubuntu
+    lock_passwd: true
+    ssh_authorized_keys:
+      - ssh-ed25519 {{ .PublicKey}}
+  - name: root
+    lock_passwd: true
+
+locale: en_US.UTF-8
+
+timezone: UTC
+
+ssh_deletekeys: 1
+
+package_upgrade: true
+
+ssh_pwauth: true
+
+manage_etc_hosts: true
+
+fqdn: kube.kube.demo
+
+hostname: kube
+
+power_state:
+  mode: reboot
+  timeout: 30
+  condition: true

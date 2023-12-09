@@ -7,8 +7,8 @@ import (
 )
 
 var providerByCode map[types.ProviderCode]Provider = map[types.ProviderCode]Provider{
-	types.FAKE1: &Fake{ProviderCode: types.FAKE1},
-	types.FAKE2: &Fake{ProviderCode: types.FAKE2},
+	types.ProviderCode_FAKE1: &Fake{ProviderCode: types.ProviderCode_FAKE1},
+	types.ProviderCode_FAKE2: &Fake{ProviderCode: types.ProviderCode_FAKE2},
 }
 
 func GetProviderByCode(code types.ProviderCode) Provider {

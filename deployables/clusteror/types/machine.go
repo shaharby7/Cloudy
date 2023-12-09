@@ -1,5 +1,7 @@
 package types
 
+type MachineId string
+
 type MachineSpecs struct {
 	CPU           int    `json:"cpu"`
 	RAM           int    `json:"ram"`
@@ -9,10 +11,10 @@ type MachineSpecs struct {
 type MachineStatus string
 
 const (
-	NEW         MachineStatus = "NEW"
-	CREATING    MachineStatus = "CREATING"
-	RUNNING     MachineStatus = "RUNNING"
-	TERMINATING MachineStatus = "TERMINATING"
-	TERMINATED  MachineStatus = "TERMINATED"
-	ERROR       MachineStatus = "ERROR"
+	MachineStatus_NEW         MachineStatus = "NEW"
+	MachineStatus_CREATING    MachineStatus = "CREATING"
+	MachineStatus_RUNNING     MachineStatus = "RUNNING"
+	MachineStatus_TERMINATING MachineStatus = "TERMINATING"
+	MachineStatus_TERMINATED  MachineStatus = "TERMINATED"
+	MachineStatus_ERROR       MachineStatus = "ERROR"
 )

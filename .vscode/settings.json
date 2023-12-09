@@ -19,7 +19,9 @@
         "projectable",
         "runspace",
         "serverutils",
-        "unscesfull"
+        "tmpl",
+        "unscesfull",
+        "userdata"
     ],
     "conventionalCommits.scopes": [
         "metalproversmanager",
