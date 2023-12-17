@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+	"github.com/shaharby7/Cloudy/deployables/clusteror/modules/network"
 	"github.com/shaharby7/Cloudy/deployables/clusteror/modules/provider"
 	"github.com/shaharby7/Cloudy/deployables/clusteror/types"
 )
@@ -14,19 +15,27 @@ type sMachine struct {
 	MachineProviderCode types.MachineProviderCode `json:"machine_provider_code"`
 	Status              types.MachineStatus       `json:"status"`
 	Specs               *types.MachineSpecs       `json:"specs"`
+	NetStack            NetStack
 }
 
 func New(ctx context.Context, options *NewOptions) (*sMachine, error) {
 	var id types.MachineId = types.MachineId(uuid.NewString())
-	return &sMachine{ID: id, ProviderCode: options.ProviderCode, Status: types.MachineStatus_NEW, Specs: &options.MachineSpecs}, nil
+	return &sMachine{
+		ID:           id,
+		ProviderCode: options.ProviderCode,
+		Status:       types.MachineStatus_NEW,
+		Specs:        &options.MachineSpecs}, nil
 }
 
 func (machine *sMachine) Create(ctx context.Context, options *CreateOptions) (*CreateResult, error) {
 	createResult := &CreateResult{}
 	prov := provider.GetProviderByCode(machine.ProviderCode)
 	machine.setStatus(ctx, types.MachineStatus_CREATING)
+	machine.NetStack.ipAllocationIds = append(machine.NetStack.ipAllocationIds, options.IpAllocationsId)
+	ipAllocation, _ := network.GetAllocationById(ctx, options.IpAllocationsId)
 	result, err := prov.CreateMachine(ctx, &provider.CreateMachineOptions{
-		Specs: machine.Specs,
+		Specs:            machine.Specs,
+		IpAllocationCode: ipAllocation.Code,
 	})
 	if err != nil {
 		machine.setStatus(ctx, types.MachineStatus_ERROR)

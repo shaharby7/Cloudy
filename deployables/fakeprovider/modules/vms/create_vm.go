@@ -15,7 +15,11 @@ func CreateVM(ctx context.Context, options *CreateVmOptions) (*Result, error) {
 		return nil, err
 	}
 	Machine_id := fmt.Sprintf("fakeprovider-vm-%s", strconv.Itoa(int(machine_id_int)))
-	err = services.SendCreateVM(ctx, Machine_id, options.User_data_b64)
+	IpAllocationId := "X"
+	if options.IpAllocationId != "" {
+		IpAllocationId = options.IpAllocationId
+	}
+	err = services.SendCreateVM(ctx, Machine_id, options.User_data_b64, IpAllocationId)
 	if err != nil {
 		return &Result{}, err
 	}

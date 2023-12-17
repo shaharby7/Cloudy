@@ -11,8 +11,9 @@ import (
 )
 
 type CreateVmOptions struct {
-	Machine_id    string `json:"machine_id"`
-	User_data_b64 string `json:"user_data_b64"`
+	Machine_id     string `json:"machine_id"`
+	User_data_b64  string `json:"user_data_b64"`
+	IpAllocationId string `json:"ip_allocation_id"`
 }
 
 type DeleteVmOptions struct {
@@ -45,13 +46,14 @@ func post[RequestBody any](ctx context.Context, path string, requestBody *Reques
 	return nil
 }
 
-func SendCreateVM(ctx context.Context, machine_id string, user_data_b64 string) error {
+func SendCreateVM(ctx context.Context, machine_id string, user_data_b64 string, IpAllocationId string) error {
 	err := post(
 		ctx,
 		"/create-vm",
 		&CreateVmOptions{
 			Machine_id:    machine_id,
 			User_data_b64: user_data_b64,
+			IpAllocationId: IpAllocationId,
 		},
 	)
 	return err

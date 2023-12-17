@@ -3,6 +3,7 @@ package cluster
 import (
 	"bytes"
 	"context"
+	b64 "encoding/base64"
 	"fmt"
 	"path/filepath"
 	"text/template"
@@ -12,8 +13,9 @@ var tmplPath, _ = filepath.Abs("../../deployables/clusteror/modules/cluster/temp
 var tmpl, tmplParseErr = template.New("user-data.tmpl").ParseFiles(tmplPath)
 
 type CompileUserDataOptions struct {
-	JoinToken string
-	PublicKey string
+	AssociatedIP string
+	JoinToken    string
+	PublicKey    string
 }
 
 func compileUserData(ctx context.Context, options *CompileUserDataOptions) (string, error) {
@@ -22,5 +24,6 @@ func compileUserData(ctx context.Context, options *CompileUserDataOptions) (stri
 	}
 	var userdata bytes.Buffer
 	tmpl.Execute(&userdata, nil)
-	return userdata.String(), nil
+	encoded := b64.StdEncoding.EncodeToString(userdata.Bytes())
+	return string(encoded), nil
 }

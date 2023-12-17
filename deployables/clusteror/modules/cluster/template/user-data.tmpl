@@ -25,8 +25,8 @@ write_files:
     kubernetesVersion: stable-1.20
     apiServer:
       certSANs:
-      - "192.168.4.20"
-    controlPlaneEndpoint: "192.168.4.20:6443"
+      - "{{.AssociatedIP}}"
+    controlPlaneEndpoint: "{{.AssociatedIP}}:6443"
     networking:
       podSubnet: 10.244.0.0/16
 

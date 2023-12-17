@@ -4,7 +4,10 @@ type ClusterId string
 type ClusterStatus string
 
 const (
-	ClusterStatus_NEW ClusterStatus = "NEW"
+	ClusterStatus_NEW      ClusterStatus = "NEW"
+	ClusterStatus_CREATING ClusterStatus = "CREATING"
+	ClusterStatus_ERROR    ClusterStatus = "ERROR"
+	ClusterStatus_READY    ClusterStatus = "READY"
 )
 
 type ClusterSpecs struct {

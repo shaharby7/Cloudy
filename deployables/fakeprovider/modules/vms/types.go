@@ -3,7 +3,8 @@ package vms
 // type Machine_id string
 
 type CreateVmOptions struct {
-	User_data_b64 string `json:"user_data_b64"`
+	User_data_b64  string `json:"user_data_b64"`
+	IpAllocationId string `json:"ip_allocation_id"`
 }
 
 type DeleteVmOptions struct {

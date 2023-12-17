@@ -21,7 +21,11 @@ type Fake struct {
 func (fake *Fake) CreateMachine(ctx context.Context, options *CreateMachineOptions) (*CreateMachineResults, error) {
 	result := &CreateMachineResults{}
 	resp, err := post[FakeproviderCreateMachineInput, FakeproviderCreateMachineOutput](
-		ctx, "/api/create-vm", &FakeproviderCreateMachineInput{User_data_b64: options.Specs.User_data_b64},
+		ctx, "/api/vms/create-vm",
+		&FakeproviderCreateMachineInput{
+			User_data_b64:  options.Specs.User_data_b64,
+			IpAllocationId: options.IpAllocationCode,
+		},
 	)
 	if err != nil {
 		return result, err
@@ -33,8 +37,22 @@ func (fake *Fake) CreateMachine(ctx context.Context, options *CreateMachineOptio
 func (fake *Fake) TerminateMachine(ctx context.Context, options *TerminateMachineOptions) (*TerminateMachineResults, error) {
 	result := &TerminateMachineResults{}
 	_, err := post[FakeproviderDeleteMachineInput, FakeproviderDeleteMachineOutput](
-		ctx, "/api/delete-vm", &FakeproviderDeleteMachineInput{Machine_id: string(*options.MachineProviderCode)},
+		ctx, "/api/vms/delete-vm", &FakeproviderDeleteMachineInput{Machine_id: string(*options.MachineProviderCode)},
 	)
+	return result, err
+}
+
+func (fake *Fake) AllocatePublicIp(ctx context.Context, options *AllocatePublicIpOptions) (*AllocatePublicIpResults, error) {
+	output, err := post[FakeproviderAllocateIpInput, FakeproviderAllocateIpOutput](
+		ctx, "/api/network/allocate-ip", nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+	result := &AllocatePublicIpResults{
+		Ip:   output.Ip,
+		Code: output.IpAllocationId,
+	}
 	return result, err
 }
 
@@ -73,7 +91,8 @@ func post[RequestBody any, ResponseData any](ctx context.Context, path string, r
 }
 
 type FakeproviderCreateMachineInput struct {
-	User_data_b64 string `json:"user_data_b64"`
+	User_data_b64  string `json:"user_data_b64"`
+	IpAllocationId string `json:"ip_allocation_id"`
 }
 
 type FakeproviderCreateMachineOutput struct {
@@ -83,6 +102,13 @@ type FakeproviderCreateMachineOutput struct {
 type FakeproviderDeleteMachineInput struct {
 	Machine_id string `json:"machine_id"`
 }
-
 type FakeproviderDeleteMachineOutput struct {
+}
+
+type FakeproviderAllocateIpInput struct {
+}
+
+type FakeproviderAllocateIpOutput struct {
+	Ip             string `json:"ip"`
+	IpAllocationId string `json:"ip_allocation_id"`
 }

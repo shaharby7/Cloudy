@@ -2,6 +2,8 @@
     "cSpell.words": [
         "abstractmetalprovider",
         "Actionables",
+        "apiv",
+        "Clientset",
         "clusteror",
         "consts",
         "contextable",
@@ -16,6 +18,7 @@
         "metalprovider",
         "metalproviders",
         "metalprovidersmanager",
+        "metav",
         "projectable",
         "runspace",
         "serverutils",

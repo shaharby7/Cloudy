@@ -4,6 +4,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/shaharby7/Cloudy/deployables/fakeprovider/modules/network"
 	"github.com/shaharby7/Cloudy/deployables/fakeprovider/modules/vms"
 
 	"github.com/shaharby7/Cloudy/pkg/common/serverutils"
@@ -17,20 +18,11 @@ func GenerateServer() controllable.Controllable {
 		*controllable.NewServerControllableConfig(port),
 	)
 
-	Server.RegisterActionable(
-		"/api/create-vm",
-		serverutils.MakeServerRoute(vms.CreateVM),
-	)
+	Server.RegisterActionable("/api/vms/create-vm", serverutils.MakeServerRoute(vms.CreateVM))
+	Server.RegisterActionable("/api/vms/delete-vm", serverutils.MakeServerRoute(vms.DeleteVM))
+	Server.RegisterActionable("/api/vms/get-vm", serverutils.MakeServerRoute(vms.GetVM))
 
-	Server.RegisterActionable(
-		"/api/delete-vm",
-		serverutils.MakeServerRoute(vms.DeleteVM),
-	)
-
-	Server.RegisterActionable(
-		"/api/get-vm",
-		serverutils.MakeServerRoute(vms.GetVM),
-	)
+	Server.RegisterActionable("/api/network/allocate-ip", serverutils.MakeServerRoute(network.AllocatePublicIp))
 
 	return Server
 }

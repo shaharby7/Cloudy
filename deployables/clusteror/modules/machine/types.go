@@ -9,10 +9,16 @@ type NewOptions struct {
 	MachineSpecs types.MachineSpecs `json:"machine_specs"`
 }
 
-type CreateOptions struct{}
+type CreateOptions struct {
+	IpAllocationsId types.IpAllocationId
+}
 
 type CreateResult struct{}
 
 type TerminateOptions struct{}
 
 type TerminateResult struct{}
+
+type NetStack struct {
+	ipAllocationIds []types.IpAllocationId
+}
