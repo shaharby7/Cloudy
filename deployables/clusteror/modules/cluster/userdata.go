@@ -23,7 +23,7 @@ func compileUserData(ctx context.Context, options *CompileUserDataOptions) (stri
 		panic(fmt.Errorf("failed to create userdata template:%s", tmplParseErr))
 	}
 	var userdata bytes.Buffer
-	tmpl.Execute(&userdata, nil)
+	tmpl.Execute(&userdata, options)
 	encoded := b64.StdEncoding.EncodeToString(userdata.Bytes())
 	return string(encoded), nil
 }

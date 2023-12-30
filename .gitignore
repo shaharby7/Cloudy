@@ -21,4 +21,4 @@
 go.work
 
 **/*.env
-**/__debug_bin
+**/__debug_bin*

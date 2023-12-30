@@ -22,7 +22,7 @@ type sCluster struct {
 	ClusterSpecs *types.ClusterSpecs `json:"cluster_specs"`
 	Masters      []types.MachineId   `json:"masters"`
 	Status       types.ClusterStatus `json:"status"`
-	Errors       []error             `json:"errors"`
+	Errors       []string            `json:"errors"`
 }
 
 func New(ctx context.Context, options *types.ClusterSpecs) (*sCluster, error) {
@@ -33,7 +33,7 @@ func New(ctx context.Context, options *types.ClusterSpecs) (*sCluster, error) {
 		ClusterSpecs: options,
 		Masters:      make([]types.MachineId, 1),
 		JoinToken:    joinToken,
-		Errors:       make([]error, 0),
+		Errors:       make([]string, 0),
 	}
 	cluster.setStatus(ctx, types.ClusterStatus_NEW)
 	return cluster, nil
@@ -49,7 +49,11 @@ func (cluster *sCluster) Create(ctx context.Context, options *CreateClusterOptio
 		return nil, cluster.handleError(ctx, err, "failed to allocate ip to master: %s")
 	}
 	cluster.Ip = master_ip_allocation.IP
-	master_userdata, err := compileUserData(ctx, nil)
+	master_userdata, err := compileUserData(ctx, &CompileUserDataOptions{
+		PublicKey:    cluster.ClusterSpecs.PublicKey,
+		JoinToken:    cluster.JoinToken,
+		AssociatedIP: master_ip_allocation.IP,
+	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate master userdata: %s", err)
 	}
@@ -70,7 +74,7 @@ func (cluster *sCluster) Create(ctx context.Context, options *CreateClusterOptio
 	if err != nil {
 		return nil, cluster.handleError(ctx, err, "failed to create master: %s")
 	}
-	return nil, nil
+	return nil, err
 }
 
 func (cluster *sCluster) setStatus(ctx context.Context, status types.ClusterStatus) {
@@ -78,8 +82,8 @@ func (cluster *sCluster) setStatus(ctx context.Context, status types.ClusterStat
 }
 
 func (cluster *sCluster) handleError(ctx context.Context, err error, errTemplate string) error {
-	handledErr := fmt.Errorf(errTemplate, err)
+	handledErr := fmt.Errorf(errTemplate, any(err.Error()))
 	cluster.setStatus(ctx, types.ClusterStatus_ERROR)
-	cluster.Errors = append(cluster.Errors, handledErr)
+	cluster.Errors = append(cluster.Errors, handledErr.Error())
 	return handledErr
 }

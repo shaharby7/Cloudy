@@ -64,7 +64,7 @@ users:
     passwd: ubuntu
     lock_passwd: true
     ssh_authorized_keys:
-      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKQIuY3x6i2IBSrsy2iaSiFuO/bSXF9JOz/3JaxgXPY1 shaharby7@gmail.com
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDK6aYszRSvTAdr0Ivjm2UPB7wY6BIg4dl0+szPfd3GEn/gYZfDUD+Nn/qvohG4/LtwTwI/cM2FT+Zk7eL7UteOPPtgb0qmFyQlo5VEZ7d5/9VAr+vIGo5IEerZLkYzs1oKnM1f8UOhL/IilyDuGswZWSqhXIQseAC/M0c0cDo9w70S0fsW6kUbNaRXr1fQ3E35OJY/9SFXC5UXdFSGJrmDURBCftNyH3VY4PEz8blMzMuH8LRMjGqVjiem97AaVEL6DB9R9nXh7WIfCNReQqNVBUIzH9ZSzWXTHWrmFczQpKtAYmXvUSUF9DPQoARuld0m54kCV4+v++A8Xs8+0uV1qAMrPiGVdjsnvu6+vsKNfSYNE2iltHMTyF+9XH1myI5Sj5gr9V3FZk9RAOKEzqWMh9nqFQY4LxPJnr/CCydpfFA/pDQwdGyi9oOjnOjFZ9h5FXsVeOG+EIaBO3b4Vq8SQwCIOBYtB8kaIIslDAacy9CT62Ql8eX7qW+n9V0sqW0= shahar@shahar-ThinkPad-P14s-Gen-2a
   - name: root
     lock_passwd: true
 

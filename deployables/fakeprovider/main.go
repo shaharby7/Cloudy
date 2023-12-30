@@ -26,7 +26,7 @@ func Initiate() *deployable.Deployable {
 		},
 		*myLoggable,
 		func(ctx context.Context, err error) { fmt.Println(err) },
-		"/home/shahar/Projects/Cloudy/local/fakeprovider.env", // todo - infer from deployer
+		"/home/shahar/Cloudy/Cloudy/local/fakeprovider.env", // todo - infer from deployer
 	)
 
 	initiateClientsOrExit()

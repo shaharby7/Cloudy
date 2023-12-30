@@ -100,7 +100,7 @@ users:
     passwd: ubuntu
     lock_passwd: true
     ssh_authorized_keys:
-      - ssh-ed25519 {{ .PublicKey}}
+      - {{ .PublicKey}}
   - name: root
     lock_passwd: true
 

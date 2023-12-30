@@ -24,7 +24,7 @@ func Initiate() *deployable.Deployable {
 		},
 		*myLoggable,
 		func(ctx context.Context, err error) { fmt.Println(err) },
-		"/home/shahar/Projects/Cloudy/local/clusteror.env", // todo - infer from deployer
+		"/home/shahar/Cloudy/Cloudy/local/clusteror.env", // todo - infer from deployer
 	)
 
 	dep.RegisterControllable(controllers.GenerateServer())
