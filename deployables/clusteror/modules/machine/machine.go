@@ -24,18 +24,18 @@ func New(ctx context.Context, options *NewOptions) (*sMachine, error) {
 		ID:           id,
 		ProviderCode: options.ProviderCode,
 		Status:       types.MachineStatus_NEW,
-		Specs:        &options.MachineSpecs}, nil
+		Specs:        &options.MachineSpecs,
+	}, nil
 }
 
 func (machine *sMachine) Create(ctx context.Context, options *CreateOptions) (*CreateResult, error) {
 	createResult := &CreateResult{}
 	prov := provider.GetProviderByCode(machine.ProviderCode)
 	machine.setStatus(ctx, types.MachineStatus_CREATING)
-	machine.NetStack.ipAllocationIds = append(machine.NetStack.ipAllocationIds, options.IpAllocationsId)
-	ipAllocation, _ := network.GetAllocationById(ctx, options.IpAllocationsId)
+	ipAllocationCode := machine.handleIpAllocation(ctx, options)
 	result, err := prov.CreateMachine(ctx, &provider.CreateMachineOptions{
 		Specs:            machine.Specs,
-		IpAllocationCode: ipAllocation.Code,
+		IpAllocationCode: ipAllocationCode,
 	})
 	if err != nil {
 		machine.setStatus(ctx, types.MachineStatus_ERROR)
@@ -63,4 +63,14 @@ func (machine *sMachine) Terminate(ctx context.Context, options *TerminateOption
 
 func (machine *sMachine) setStatus(ctx context.Context, status types.MachineStatus) {
 	machine.Status = status
+}
+
+func (machine *sMachine) handleIpAllocation(ctx context.Context, options *CreateOptions) string {
+	if options.IpAllocationsId == "" {
+		return ""
+	}
+	machine.NetStack.IpAllocationIds = append(machine.NetStack.IpAllocationIds, options.IpAllocationsId)
+	ipAllocation, _ := network.GetAllocationById(ctx, options.IpAllocationsId)
+	ipAllocationCode := ipAllocation.Code
+	return ipAllocationCode
 }

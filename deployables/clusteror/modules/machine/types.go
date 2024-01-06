@@ -20,5 +20,5 @@ type TerminateOptions struct{}
 type TerminateResult struct{}
 
 type NetStack struct {
-	ipAllocationIds []types.IpAllocationId
+	IpAllocationIds []types.IpAllocationId `json:"ip_allocation_ids"`
 }
