@@ -16,20 +16,59 @@ write_files:
     c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSUZWTW1rTnRuRmZDaXRjcFFlWnFR
     dVZQK0NKV1JtWGp3aGlRakoyalJxaS8gY2FAa3ViZS5kZW1vCg==
 
+- path: /etc/modules-load.d/containerd.conf
+  permissions: '0644'
+  content: |
+    overlay
+    br_netfilter
+
+- path: /etc/sysctl.d/10-kubernetes.conf
+  permissions: '0644'
+  content: |
+    net.ipv4.ip_forward=1
+    net.bridge.bridge-nf-call-iptables=1
+    net.bridge.bridge-nf-call-arptables=1
+
+- path: /etc/crictl.yaml
+  permissions: '0644'
+  content: |
+    runtime-endpoint: unix:///var/run/containerd/containerd.sock
+    timeout: 0
+    debug: false
+
+# - path: /etc/cni/net.d/net-conf.json
+#   permission: '0644'
+#   content: |
+#     {
+#       "cniVersion": "0.3.1"
+#       "Network": "10.244.0.0/16",
+#       "Backend": {
+#         "Type": "vxlan"
+#       }
+#     }
+# 
+# - path: /etc/cni/net.d/loopback-conf.json
+#   permission: '0644'
+#   content: |
+#     {
+#       "cniVersion": "0.3.1",
+#       "name": "lo",
+#       "type": "loopback"
+#     }
+
 # k8s conf
-- path: /home/ubuntu/kubeadm-config.yml
+- path: /home/ubuntu/kubeadm-config.yaml
   permissions: '0777'
   content: |
-    apiVersion: kubeadm.k8s.io/v1beta2
+    apiVersion: kubeadm.k8s.io/v1beta3
     kind: ClusterConfiguration
-    kubernetesVersion: stable-1.20
+    kubernetesVersion: stable-1.28
     apiServer:
       certSANs:
       - "{{.AssociatedIP}}"
     controlPlaneEndpoint: "{{.AssociatedIP}}:6443"
     networking:
       podSubnet: 10.244.0.0/16
-
 
 apt:
   sources_list: |
@@ -87,10 +126,11 @@ runcmd:
   - [apt-mark, hold, kubelet, kubectl, kubeadm, containerd]
   # Configure containerd
   - [mkdir, -p, /etc/containerd]
-  - [sh, -c, "containerd config default > /etc/containerd/config.toml"]
+  - [sh, -c, "containerd config default | sed 's/SystemdCgroup = false/SystemdCgroup = true/g' > /etc/containerd/config.toml"]
+  - [sh, -c , "systemctl restart containerd"]
   # Init k8s
-  - [cd, "~"]
-  - [sh, -c "sudo kubeadm init --config=kubeadm-config.yaml --upload-certs --token {{.JoinToken}}"]
+  # - [cd, "~"]
+  # - [sh, -c "sudo kubeadm init --config=kubeadm-config.yaml --upload-certs --token {{.JoinToken}}"]
 
 users:
   - name: ubuntu
@@ -120,7 +160,7 @@ fqdn: kube.kube.demo
 
 hostname: kube
 
-power_state:
-  mode: reboot
-  timeout: 30
-  condition: true
+# power_state:
+#   mode: reboot
+#   timeout: 30
+#   condition: true
